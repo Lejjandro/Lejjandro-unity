@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class player_Script : MonoBehaviour
@@ -7,7 +8,7 @@ public class player_Script : MonoBehaviour
     public float movementSpeed = 5f;
     private Vector3 move = new Vector3(0,0,0);
     [Header("Jump/Hoppa")]
-    public float jump;
+    public float jump = 10f;
     private int extraJump;
     public int extraJumpsValue = 1;
     [Header("Ground check/Markkontroll")]
@@ -15,6 +16,8 @@ public class player_Script : MonoBehaviour
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
     private bool isGrounded;
+    [Header("Players health/Players hälsa")]
+    public int health = 100;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -43,13 +46,13 @@ public class player_Script : MonoBehaviour
         {
             if (isGrounded)
             {
-                rb.AddForce(new Vector3(rb.linearVelocityX, jump));
+                rb.linearVelocity = new Vector3(rb.linearVelocityX, jump);
             }
         //Double Jump
         //Dubbelhopp
             else if (extraJump > 0)
             {
-                rb.AddForce(new Vector3(rb.linearVelocityX, jump));
+                rb.linearVelocity = new Vector3(rb.linearVelocityX, jump);
                 extraJump --;
             }
 
@@ -58,5 +61,26 @@ public class player_Script : MonoBehaviour
     private void FixedUpdate()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //Spikes collision
+        if (collision.gameObject.tag == "Spikes")
+        {
+            health -= 50;
+            rb.linearVelocity = new Vector3(rb.linearVelocityX, jump);
+            if (health <= 0)
+            {
+                Die();
+            }
+        }
+    }
+
+    private void Die()
+    {
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+        }
     }
 }
