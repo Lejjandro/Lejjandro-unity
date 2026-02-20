@@ -1,6 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class player_Script : MonoBehaviour
 {
     public Rigidbody2D rb;
@@ -18,6 +18,7 @@ public class player_Script : MonoBehaviour
     private bool isGrounded;
     [Header("Players health/Players hälsa")]
     public int health = 100;
+    public Image healthBar;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -57,6 +58,9 @@ public class player_Script : MonoBehaviour
             }
 
         }
+        //Healthbar
+        //Hälsobar
+        healthBar.fillAmount = health / 100f;
     }
     private void FixedUpdate()
     {
