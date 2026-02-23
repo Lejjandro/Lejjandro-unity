@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 public class player_Script : MonoBehaviour
@@ -21,8 +20,8 @@ public class player_Script : MonoBehaviour
     public int health = 100;
     public Image healthBar;
     [Header("Wallsliding check/Väggglidningskontroll")]
-    private  bool isWallSliding;
     public float wallslidingSpeed = 2f;
+    private  bool isWallSliding;
     public Transform wallCheck;
     public float wallCheckRadius = 0.2f;
     public LayerMask wallLayer;
@@ -45,7 +44,7 @@ public class player_Script : MonoBehaviour
         //Dubbelhopp
         if (isGrounded)
         {
-            extraJump = 1;
+            extraJump = extraJumpsValue;
         }
         
         //Jump
@@ -92,16 +91,22 @@ public class player_Script : MonoBehaviour
 
     private void WallSlide()
     {
-        if (isOnWall() && !IsOnGround() && horizontal != 0f)
+        if (isOnWall() && !isGrounded)
         {
-            isWallSliding = true;
-            rb.linearVelocity = new Vector3(rb.linearVelocityX, Mathf.Clamp(rb.linearVelocityY, -wallslidingSpeed, float.MaxValue));
+        isWallSliding = true;
+
+        
+            if (rb.linearVelocityY <= 0)
+            {
+                rb.linearVelocity = new Vector3(rb.linearVelocityX,-wallslidingSpeed);
+            }
         }
-        else
-        {
-            isWallSliding = false;
-        }
-        Debug.Log("IsWallSliding:");
+    else
+    {
+        isWallSliding = false;
+    }
+
+    Debug.Log("IsWallSliding: " + isWallSliding);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
