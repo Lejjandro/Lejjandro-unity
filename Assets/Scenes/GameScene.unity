@@ -842,7 +842,7 @@ GameObject:
   - component: {fileID: 466540865}
   m_Layer: 3
   m_Name: Square (6)
-  m_TagString: Untagged
+  m_TagString: Platform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1229,7 +1229,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.737, y: -2.121, z: -9.962591}
+  m_LocalPosition: {x: 36.51, y: -1.81, z: -9.962591}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2297,7 +2297,7 @@ Transform:
   m_GameObject: {fileID: 817038797}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.737, y: -2.121, z: 0.037408873}
+  m_LocalPosition: {x: 36.51, y: -1.81, z: 0.037408873}
   m_LocalScale: {x: 2.0815, y: 5.9388, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2346,7 +2346,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 817038802}
   movementSpeed: 5
-  jump: 5
+  jumpPower: 5
   extraJumpsValue: 1
   groundCheck: {fileID: 1768822781}
   groundCheckRadius: 0.2
@@ -2361,6 +2361,12 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 72
+  wallJumpingTime: 0.2
+  wallJumpingDuration: 0.2
+  wallJumpingPower: {x: 10, y: 7.5, z: 0}
+  dashSpeed: 20
+  dashDuration: 0.2
+  dashCooldown: 1
 --- !u!1 &861056121
 GameObject:
   m_ObjectHideFlags: 0
@@ -2986,7 +2992,7 @@ Transform:
   m_GameObject: {fileID: 1158951165}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.737, y: -2.121, z: -9.962591}
+  m_LocalPosition: {x: 36.51, y: -1.81, z: -9.962591}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3004,7 +3010,7 @@ GameObject:
   - component: {fileID: 1564114936}
   - component: {fileID: 1564114935}
   - component: {fileID: 1564114934}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
