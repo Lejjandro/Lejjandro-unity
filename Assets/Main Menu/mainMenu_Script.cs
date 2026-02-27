@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class mainMenu_Script : MonoBehaviour
@@ -11,11 +12,17 @@ public class mainMenu_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+       
     }
-    
-    public void Playgame()
+
+    public void PlayGame()
     {
+         StartCoroutine(Playgame());
+    }
+
+    IEnumerator Playgame()
+    {
+        yield return new WaitForSeconds(0.1f);
         SceneManager.LoadSceneAsync (1);
     }
 }
