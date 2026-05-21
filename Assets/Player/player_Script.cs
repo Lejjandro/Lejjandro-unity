@@ -27,8 +27,9 @@ public class player_Script : MonoBehaviour
     public int health = 100;
     public Image healthBar;
     [Header("Wallsliding check/Väggglidningskontroll")]
-    public float wallslidingSpeed = 2f;
-    private  bool isWallSliding;
+    public float wallSlidingSpeed = 2f;
+    public float wallSlidingSpeedHolding = 1f; // Slower fall speed when holding toward the wall
+    private bool isWallSliding;
     public Transform wallCheck;
     public float wallCheckRadius = 0.2f;
     public LayerMask wallLayer;
@@ -82,12 +83,21 @@ public class player_Script : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
+        // As soon as the player lands, cancel any pending wall jump state immediately.
+        if (isGrounded)
+        {
+            CancelInvoke(nameof(stopWallJumping));
+            isWallJumping = false;
+        }
+
         anim.SetFloat("xVelocity", Mathf.Abs(rb.linearVelocityX));
-        anim.SetFloat("yVelocity",rb.linearVelocityY);
-         
+        anim.SetFloat("yVelocity", rb.linearVelocityY);
+
+        // Drive the jump animation purely from grounded state — no manual bool flipping needed.
+        anim.SetBool("isJumping", !isGrounded && !isWallSliding);
+
         WallSlide();
         IsOnGround();
-
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -150,33 +160,25 @@ public class player_Script : MonoBehaviour
 
     private void HandleJump()
     {
-        //Jump
-        //Hoppa
+        // Don't process normal jumps while a wall jump is controlling the player.
+        if (isWallJumping) return;
+
+        //Jump / Hoppa
         if (Input.GetButtonDown("Jump"))
         {
             if (isGrounded)
             {
                 rb.linearVelocity = new Vector3(rb.linearVelocityX, jumpPower);
-
-                anim.SetBool("isJumping", true);
             }
-            //Double Jump
-            //Dubbelhopp
-            else if (extraJump > 0)
+            //Double Jump / Dubbelhopp
+            else if (extraJump > 0 && !isWallSliding)
             {
                 rb.linearVelocity = new Vector3(rb.linearVelocityX, jumpPower);
-                extraJump --;
+                extraJump--;
             }
-
         }
 
-        if (isGrounded && rb.linearVelocityY <= 0)
-        {
-            anim.SetBool("isJumping", false);
-        }
-
-        //Double Jump
-        //Dubbelhopp
+        //Double Jump reset / Dubbelhopp återställning
         if (isGrounded)
         {
             extraJump = extraJumpsValue;
@@ -219,7 +221,6 @@ public class player_Script : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && isDashing)
         {
             anim.SetBool("isDashingAttacking", true);
-            anim.SetBool("isJumping", false);
             anim.SetTrigger("dashAttack");
             /*Collider2D[] enemysToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);
             for (int i = 0; i < enemysToDamage.Length; i++)
@@ -231,20 +232,22 @@ public class player_Script : MonoBehaviour
         {
             anim.SetBool("isDashingAttacking", false);
         }
-        
     }
 
     private void WallSlide()
     {
-        if (isOnWall())
+        if (isOnWall() && !isGrounded)
         {
             isWallSliding = true;
             anim.SetBool("isWallSliding", true);
 
-        
             if (rb.linearVelocityY <= 0)
             {
-                rb.linearVelocity = new Vector3(rb.linearVelocityX,-wallslidingSpeed);
+                // Determine whether the player is pressing toward the wall they are on.
+                // The wall is in the direction the player is facing (localScale.x > 0 = right).
+                bool holdingTowardWall = (isfacingRight && horizontal > 0f) || (!isfacingRight && horizontal < 0f);
+                float targetSpeed = holdingTowardWall ? wallSlidingSpeedHolding : wallSlidingSpeed;
+                rb.linearVelocity = new Vector2(rb.linearVelocityX, -targetSpeed);
             }
         }
         else
@@ -252,31 +255,31 @@ public class player_Script : MonoBehaviour
             isWallSliding = false;
             anim.SetBool("isWallSliding", false);
         }
-
-            //Debug.Log("IsWallSliding: " + isWallSliding);
     }
 
     private void WallJump()
     {
         if (isWallSliding)
         {
-            isWallJumping = true;
+            // Store the jump-off direction and reset the grace window.
             wallJumpDirection = -transform.localScale.x;
-            wallJumpingCounter = wallJumpingDuration;
-
+            wallJumpingCounter = wallJumpingTime;
             CancelInvoke(nameof(stopWallJumping));
         }
         else
         {
             wallJumpingCounter -= Time.deltaTime;
         }
-        if (Input.GetButtonDown("Jump") && (wallJumpingCounter > 0f))
+
+        if (Input.GetButtonDown("Jump") && wallJumpingCounter > 0f)
         {
             isWallJumping = true;
-            rb.linearVelocity = new Vector3(wallJumpDirection * wallJumpingPower.x, wallJumpingPower.y);
+            rb.linearVelocity = new Vector2(wallJumpDirection * wallJumpingPower.x, wallJumpingPower.y);
             wallJumpingCounter = 0f;
+            extraJump = extraJumpsValue; // Restore double jump after wall jump
 
-            if(transform.localScale.x != wallJumpDirection)
+            // Flip player to face the direction they jumped toward.
+            if (transform.localScale.x != wallJumpDirection)
             {
                 isfacingRight = !isfacingRight;
                 Vector3 localScale = transform.localScale;
@@ -284,7 +287,9 @@ public class player_Script : MonoBehaviour
                 transform.localScale = localScale;
             }
 
-                Invoke(nameof(stopWallJumping), wallJumpingDuration);
+            // Cancel any previous pending stop before scheduling a new one.
+            CancelInvoke(nameof(stopWallJumping));
+            Invoke(nameof(stopWallJumping), wallJumpingDuration);
         }
     }
 
@@ -317,6 +322,9 @@ public class player_Script : MonoBehaviour
 
     private void flip()
     {
+        // Don't flip while a wall jump is controlling the player's direction.
+        if (isWallJumping) return;
+
         if (isfacingRight && horizontal < 0f || !isfacingRight && horizontal > 0f)
         {
             isfacingRight = !isfacingRight;
