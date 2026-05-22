@@ -53,6 +53,7 @@ public class player_Script : MonoBehaviour
     public float attackRange;
     public LayerMask whatIsEnemies;
     public int damage;
+    public bool isAttacking;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -295,10 +296,13 @@ public class player_Script : MonoBehaviour
 
     private void HandleAttack()
     {
+        isAttacking = false;
+        
         if (timeBtwAttack <= 0 && !isDashing)
         {
             if (Input.GetMouseButtonDown(0) && isGrounded)
             {
+                isAttacking = true;
                 Debug.Log("Player Attacked!");
                 anim.SetTrigger("attack");
                 /*Collider2D[] enemysToDamage = Physics2D.OverlapCircleAll(attackPos.position, attackRange, whatIsEnemies);

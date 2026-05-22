@@ -474,13 +474,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2491601620146766564, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
+      propertyPath: m_Constraints
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3988319649669763686, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14.506741
       objectReference: {fileID: 0}
     - target: {fileID: 3988319649669763686, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 18.574818
+      value: 18.568
       objectReference: {fileID: 0}
     - target: {fileID: 3988319649669763686, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15498,6 +15502,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   damage: 1
+  isAttacking: 0
 --- !u!95 &817038804
 Animator:
   serializedVersion: 7
@@ -21995,7 +22000,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2491601620146766564, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_Constraints
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3988319649669763686, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -22003,7 +22008,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3988319649669763686, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 19.12
+      value: 18.581
       objectReference: {fileID: 0}
     - target: {fileID: 3988319649669763686, guid: f68b7df0ee09c6147ab0abcf5a767fb7, type: 3}
       propertyPath: m_LocalPosition.z

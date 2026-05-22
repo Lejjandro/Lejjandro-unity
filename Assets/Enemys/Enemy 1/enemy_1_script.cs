@@ -29,11 +29,19 @@ public class enemy_1_script : MonoBehaviour
     [Range(1, 360)] public float angle = 45f;
     public LayerMask targetLayer;
     public LayerMask obstructionLayer;
+    private SpriteRenderer sprite;
     public GameObject playerRef;
     public bool canSeePlayer { get; private set; }
     private bool isWaiting = false;
     private float dotThreshold;
-    private SpriteRenderer sprite;
+
+    private player_Script playerScript;
+    // For player last known position
+    // För spelarens senast kända position
+    private Vector2 lastKnownPlayerPosition;
+    private bool hasLastKnownPosition = false;
+    private float timeSinceLastSeen = 0f;
+    public float forgetTime = 5f;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -47,6 +55,7 @@ public class enemy_1_script : MonoBehaviour
         playerRef = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(FOVCheck());
         dotThreshold = Mathf.Cos((angle * 0.5f) * Mathf.Deg2Rad);
+        playerScript = playerRef.GetComponent<player_Script>();
     }
 
 
@@ -57,6 +66,8 @@ public class enemy_1_script : MonoBehaviour
 
         HandleMovement();
         HandleAttacks();
+        playerLastSeenPosition();
+        feelPlayerAttack();
     }
 
 
@@ -109,6 +120,78 @@ public class enemy_1_script : MonoBehaviour
         else
         {
             canSeePlayer = false;
+        }
+    }
+
+    private void playerLastSeenPosition()
+    {
+        if (canSeePlayer)
+        {
+            lastKnownPlayerPosition = playerRef.transform.position;
+            hasLastKnownPosition = true;
+            timeSinceLastSeen = 0f;
+        }
+        else if (hasLastKnownPosition && isAttacking == false)
+        {
+            timeSinceLastSeen += Time.deltaTime;
+            if (timeSinceLastSeen < forgetTime)
+            {
+                // Move towards last known position
+                Vector2 directionToLastKnown = (lastKnownPlayerPosition - (Vector2)transform.position).normalized;
+                rb.linearVelocity = directionToLastKnown * speed * 1.5f;
+
+                // Flip to face the last known position
+                if (lastKnownPlayerPosition.x > transform.position.x && transform.localScale.x < 0)
+                {
+                    Flip();
+                }
+                else if (lastKnownPlayerPosition.x < transform.position.x && transform.localScale.x > 0)
+                {
+                    Flip();
+                }
+            }
+            else
+            {
+                hasLastKnownPosition = false; // Forget the last known position after some time
+            }
+        }
+
+        if (hasLastKnownPosition && Vector2.Distance(transform.position, lastKnownPlayerPosition) < 0.5f)
+        {
+
+            waitOnLastKnownPosition();
+            hasLastKnownPosition = false;
+
+        }
+    }
+
+    private void waitOnLastKnownPosition()
+    {
+        isWaiting = true;
+        
+        if (isWaiting == true)
+        {
+            rb.linearVelocity = Vector2.zero;
+            anim.SetBool("isRunning", false);
+            Invoke("StopWaiting", waitTime);
+        }
+    }
+
+    private void StopWaiting()
+    {
+        isWaiting = false;
+        anim.SetBool("isRunning", true);
+    }
+
+    private void feelPlayerAttack()
+    {
+        float distance = Vector2.Distance(transform.position, playerRef.transform.position);
+
+        if (playerScript.isAttacking && distance < 6f)
+        {
+            lastKnownPlayerPosition = playerRef.transform.position;
+            hasLastKnownPosition = true;
+            timeSinceLastSeen = 0f;
         }
     }
 
@@ -382,6 +465,12 @@ public class enemy_1_script : MonoBehaviour
         {
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, playerRef.transform.position);
+        }
+
+        if (hasLastKnownPosition)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(lastKnownPlayerPosition, 0.2f);
         }
     }
 
