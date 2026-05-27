@@ -67,7 +67,7 @@ public class enemy_1_script : MonoBehaviour
         HandleMovement();
         HandleAttacks();
         playerLastSeenPosition();
-        feelPlayerAttack();
+        //feelPlayerAttack();
     }
 
 
@@ -185,14 +185,9 @@ public class enemy_1_script : MonoBehaviour
 
     private void feelPlayerAttack()
     {
-        float distance = Vector2.Distance(transform.position, playerRef.transform.position);
-
-        if (playerScript.isAttacking && distance < 6f)
-        {
             lastKnownPlayerPosition = playerRef.transform.position;
             hasLastKnownPosition = true;
             timeSinceLastSeen = 0f;
-        }
     }
 
     private void HandleMovement()
@@ -421,6 +416,7 @@ public class enemy_1_script : MonoBehaviour
         health -= damage;
         anim.SetTrigger("Hit");
         sprite.color = new Color(250f, 89f, 89f, 255f);
+        feelPlayerAttack();
         Debug.Log("Enemy took " + damage + " damage!");
         Invoke("ResetColor", 0.4f);
         if (health <= 0)
