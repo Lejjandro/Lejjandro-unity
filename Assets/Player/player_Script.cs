@@ -1,11 +1,11 @@
-using NUnit.Framework;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Callbacks;
+//using NUnit.Framework;
+//using TMPro;
+//using Unity.VisualScripting;
+//using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.XR;
+//using UnityEngine.XR;
 public class player_Script : MonoBehaviour
 {
     public Rigidbody2D rb;
